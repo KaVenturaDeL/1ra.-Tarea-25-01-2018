@@ -1,0 +1,200 @@
+//Rotacion en un mismo eje y rotacion desde una esquina de la figura
+
+interface drawable //interfaz desplegable
+{
+  void Draw();
+}
+
+//-------------------------------------------------------------------------
+
+interface transformable
+{
+  void RotarCentro(float x, float y);  //degrees = grados
+  void Rotar(float rad);
+  void Trasladar(float x, float y); //translate = traducir
+  void Trasladar(PVector p);
+  void FijarPosicion(float x, float y); //set position = establecer posicion en x y en y
+  //void Escala(float x, float y);
+}
+
+//-------------------------------------------------------------------------
+
+Poligono poligono; 
+Cuadrado cuadrado; 
+
+float fps=30.0f;
+float dt=0.01f;
+int x =0; 
+int y =0; 
+
+float i = 0; 
+
+
+void setup()
+{
+  size(100, 100);
+  
+  rectMode(CENTER);
+  
+  frameRate(fps);  //framerate = Velocidad de fotogramas
+  poligono = new Poligono(3);
+  cuadrado = new Cuadrado();
+  
+  poligono.FijarPosicion(10,10);
+  cuadrado.FijarPosicion(50,50); //set position = establecer posicion del triangulo en x y en y
+}
+
+void draw()
+{
+  background(#DEB3DC);  //background =  Fondo
+  
+  
+  
+  x = x + 1;  
+  y = y + 1;  
+  
+
+ 
+  
+  translate(50,50);
+  
+  rotate(radians(x));
+  translate(-55,-55);
+  
+  rect(50,50,20,20);
+ 
+ 
+  
+  translate(50,50);  
+  rotate(i);  
+  rect(0, 0, 10, 10);  
+  i = i + 0.09;  
+
+  
+  poligono.Draw();
+  cuadrado.Draw();
+
+  poligono.Rotar(3.1416/2.0*dt); //para rotar en su lugar
+  cuadrado.Rotar(3.1416/2.0*dt); //para rotar en su lugar
+ 
+  poligono.Trasladar(10*dt,10*dt);
+  cuadrado.Trasladar(50*dt,50*dt);
+  
+  //triangulo.Escala(0.9*dt,0.9*dt);
+  //cuadrado.Escala(0.9*dt,0.9*dt);
+}
+
+//--------------------------------------------------------------------
+
+class Poligono implements drawable, transformable  //dibujar implementos para la clase poligono trasformable
+{
+  PVector points[]; //si son varias variables
+  int N;  //numero de elementos
+  PVector center;
+  
+  //Default behaviour = Comportamiento predeterminado
+  Poligono(int N)
+  {
+    this.N=N;
+    center = new PVector(0.0, 0.0);
+    points = new PVector[N];
+    
+    for(int n=0; n<N; n++)
+    {
+      points[n] = new PVector(0.0f, 0.0f);
+    }
+    
+  }
+  
+  void RotarCentro(float x, float y)  //degrees = grados
+  {
+    //center.x=center.x*cos(rad)-center.y*sin(rad);
+    //center.y=center.x*sin(rad)+center.y*cos(rad);
+  }
+  void Rotar(float rad)  //rotate = rotar
+  {
+   // points[k].x=points[k].x*cos(rad)-points[k].y*sin(rad);
+    //points[k].y=points[k].x*sin(rad)+points[k].y*cos(rad);
+  }
+  
+  //---------------------------------------------------------------------
+  
+  void Trasladar(float x, float y)
+  {
+    center.x+=x;
+    center.y+=y;
+  }
+  
+  void Trasladar(PVector p)
+  {
+    for (int k = 0; k < N; k++)
+    {
+      points[k].x+=p.x;
+      points[k].y+=p.y;
+    }
+  }
+  
+  /*
+  void Escala(float x, float y)
+  {
+    for(int k = 0; k < N; k++);
+    {
+      points[k].x=x*points[k].x;
+      points[k].y=y*points[k].y;
+    }
+  }
+  */
+  
+  void FijarPosicion(float x, float y)  //set position = Ajustar posición
+  {
+    center.x=x;
+    center.y=y;
+  }
+  
+  void ComputeMassCenter()  // Calcular el centro de masas
+  {
+    float m_x=0.0;
+    float m_y=0.0;
+    
+    for(int k=0; k<N; k++)
+    {
+      m_x+=points[k].x;
+      m_y+=points[k].y;
+    }
+    
+    center.x=m_x/(float)N;
+    center.y=m_y/(float)N;
+  }
+  
+  void Draw()
+  {
+    beginShape();  //begin shape = comenzar la forma
+    for(int k = 0; k < N; k++)
+    {
+      vertex(center.x+points[k].x, center.y+points[k].y);  //vertex = vertice
+    }
+    endShape(CLOSE);  //end shape = fin de la forma
+  }
+  
+}
+
+//--------------------------------------------------------------------
+
+class Cuadrado extends Poligono  // La clase cuadrada extiende el polígono
+{
+  Cuadrado()
+  {
+    super(4);
+    print("Message");
+    print(N);
+    
+    points[0].x=0; points[0].y=0;
+    points[1].x=10; points[1].y=0;
+    points[2].x=10; points[2].y=10;
+    points[3].x=0; points[3].y=10;
+    
+    ComputeMassCenter();  // Calcular el centro de masas
+  }
+}
+
+//----------------------------------------------------------------------
